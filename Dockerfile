@@ -6,6 +6,7 @@ ARG WEB_USER=www-data                      # Web user for web server (www-data,3
 ARG BUILD_PKP_APP_OS=alpine:3.22           # OS used to build (not run).  
 ARG BUILD_PKP_APP_PATH=/app                # Where app is built.
 ARG BUILD_LABEL=notset
+ARG ENABLE_XDEBUG=0
 
 
 # Stage 1: Download PKP source code from released tarball.
@@ -27,6 +28,8 @@ RUN apk add --no-cache curl tar && \
 
 # Stage 2: Build PHP extensions and dependencies
 FROM ${WEB_SERVER} AS pkp_build
+
+ARG ENABLE_XDEBUG
 
 # Packages needed to build PHP extensions
 ENV PKP_DEPS="\
@@ -85,6 +88,8 @@ ENV PHP_EXTENSIONS="\
     bcmath \
     ftp"
 
+COPY xdebug.ini /tmp/xdebug.ini
+
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends $PKP_DEPS && \
@@ -92,7 +97,13 @@ RUN apt-get update && \
     curl -sSLf https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions \
     -o /usr/local/bin/install-php-extensions && \
     chmod +x /usr/local/bin/install-php-extensions && \
+    if [ "${ENABLE_XDEBUG}" = "1" ]; then \
+        PHP_EXTENSIONS="$PHP_EXTENSIONS xdebug"; \
+    fi && \
     install-php-extensions $PHP_EXTENSIONS && \
+    if [ "${ENABLE_XDEBUG}" = "1" ]; then \
+        cp /tmp/xdebug.ini /usr/local/etc/php/conf.d/; \
+    fi && \
     \
     apt-get purge -y --auto-remove build-essential && \
     rm -rf /var/lib/apt/lists/*
@@ -106,7 +117,8 @@ ARG PKP_TOOL \
     WEB_SERVER \
     WEB_USER \
     BUILD_PKP_APP_PATH \
-    BUILD_LABEL
+    BUILD_LABEL \
+    ENABLE_XDEBUG
 
 LABEL maintainer="Public Knowledge Project <marc.bria@uab.es>"
 LABEL org.opencontainers.image.vendor="Public Knowledge Project"

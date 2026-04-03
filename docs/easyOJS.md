@@ -9,7 +9,7 @@ This document, created in 2023 during the [Hannover Sprint](https://pkp.sfu.ca/2
 Be sure you properly installed `docker` and `docker-compose` and the `docker` service is running.
 
 ```
-git clone https://github.com/pkp/containers.git journalName && cd journalName
+git clone https://github.com/pkp/containers.git ojs-plugins-workspace && cd ojs-plugins-workspace
 rm docs templates -Rf                               # Delete folders that are not useful in production
 vim .env                         					# Set environment variables as you wish (ojs version, ports, url...)
 source .env && wget "https://github.com/pkp/${PKP_TOOL}/raw/${PKP_VERSION}/config.TEMPLATE.inc.php" -O ./volumes/config/pkp.config.inc.php
@@ -34,10 +34,10 @@ you will be able to start a full OJS stack (web app + database containers) in 4 
 
     ```bash
     git clone https://github.com/pkp/containers.git
-    mv containers journalName && cd journalName
+    mv containers ojs-plugins-workspace && cd ojs-plugins-workspace
     ```
 
-   Replace "journalName" with a short name of your journal (probably you will like to set the same value you use for COMPOSE_PROJECT_NAME variable).
+   Replace `ojs-plugins-workspace` with your preferred local folder name if you want something shorter.
 
 2. Set your environment variables
 

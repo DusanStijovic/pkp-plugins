@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Simple Popup Button Fixture</title>
+    <link rel="stylesheet" href="/plugins/generic/simplePopupButton/styles/popupButton.css">
+  </head>
+  <body>
+    <main>
+      <h1>Simple Popup Button Fixture</h1>
+      <p>Fixture page for Playwright tests.</p>
+    </main>
+
+    <button
+      type="button"
+      id="simplePopupButton"
+      class="simplePopupButton"
+      aria-haspopup="dialog"
+      aria-controls="simplePopupModal"
+    >
+      Open Popup
+    </button>
+
+    <div
+      id="simplePopupModal"
+      class="simplePopupModal"
+      hidden
+      aria-hidden="true"
+    >
+      <div class="simplePopupModal__backdrop" data-simple-popup-close></div>
+      <div
+        class="simplePopupModal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="simplePopupModalTitle"
+      >
+        <button
+          type="button"
+          class="simplePopupModal__close"
+          aria-label="Close popup"
+          data-simple-popup-close
+        >
+          x
+        </button>
+        <h2 id="simplePopupModalTitle" class="simplePopupModal__title">Simple Popup</h2>
+        <p class="simplePopupModal__body">Fixture modal body.</p>
+      </div>
+    </div>
+
+    <script src="/plugins/generic/simplePopupButton/js/popupButton.js"></script>
+  </body>
+</html>

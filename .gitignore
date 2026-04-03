@@ -1,3 +1,9 @@
 .swp
 .sandbox
 older
+dist/
+volumes/db/*
+volumes/logs/app/*
+volumes/logs/db/*
+volumes/private/scheduledTaskLogs/
+volumes/private/usageStats/

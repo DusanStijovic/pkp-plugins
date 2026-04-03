@@ -12,11 +12,11 @@ services:
       MYSQL_DATABASE: "${MYSQL_DATABASE:-pkp}"
       MYSQL_USER: "${MYSQL_USER:-pkp}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD:-changeMePlease}"
-#    volumes:
-#      - ./volumes/db:/var/lib/mysql
-#      - ./volumes/logs/db:/var/log/mysql
-#      - ./volumes/config/db.charset.conf:/etc/mysql/conf.d/charset.cnf
-#      - ./volumes/db-import:/docker-entrypoint-initdb.d
+    volumes:
+      - ./volumes/db:/var/lib/mysql
+      - ./volumes/logs/db:/var/log/mysql
+      - ./volumes/config/db.charset.conf:/etc/mysql/conf.d/charset.cnf
+      - ./volumes/db-import:/docker-entrypoint-initdb.d
     networks:
       - inside
     restart: unless-stopped
@@ -32,6 +32,7 @@ services:
         PKP_VERSION: ${PKP_VERSION}
         WEB_SERVER: ${WEB_SERVER}
         BUILD_PKP_APP_OS: ${BUILD_PKP_APP_OS}
+        ENABLE_XDEBUG: ${ENABLE_XDEBUG:-0}
     env_file:
       - .env
     container_name: "pkp_app_${COMPOSE_PROJECT_NAME:-demo}"
@@ -39,16 +40,19 @@ services:
     ports:
       - ${HTTP_PORT:-8081}:80
       - ${HTTPS_PORT:-443}:443
+      - 9003:9003
     volumes:
       # Keep host and container sync:
       - /etc/localtime:/etc/localtime
-#      - ./volumes/private:/var/www/files
-#      - ./volumes/public:/var/www/html/public
-#      - ./volumes/logs/app:/var/log/apache2
+      - ./volumes/private:/var/www/files
+      - ./volumes/public:/var/www/html/public
+      - ./plugins/generic/simplePopupButton:/var/www/html/plugins/generic/simplePopupButton
+      - ./volumes/logs/app:/var/log/apache2
 #      # WARNING: You can only enable file-volumes if file exists in the container.
-#      - ./volumes/config/pkp.config.inc.php:/var/www/html/config.inc.php
+      - ./volumes/config/pkp.config.inc.php:/var/www/html/config.inc.php
 #      - ./volumes/config/apache.htaccess:/var/www/html/.htaccess
       - ./volumes/config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./config/php.xdebug.ini:/usr/local/etc/php/conf.d/zz-xdebug.ini
 
     networks:
       - inside
