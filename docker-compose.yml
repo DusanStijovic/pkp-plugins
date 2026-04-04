@@ -40,7 +40,6 @@ services:
     ports:
       - ${HTTP_PORT:-8081}:80
       - ${HTTPS_PORT:-443}:443
-      - 9003:9003
     volumes:
       # Keep host and container sync:
       - /etc/localtime:/etc/localtime
