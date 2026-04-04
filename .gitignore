@@ -2,6 +2,8 @@
 .sandbox
 older
 dist/
+node_modules/
+test-results/
 volumes/db/*
 volumes/logs/app/*
 volumes/logs/db/*
