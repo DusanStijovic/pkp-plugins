@@ -8,6 +8,9 @@ use PKP\plugins\Hook;
 
 class FAQPopupPlugin extends GenericPlugin
 {
+    /** @var bool Prevent duplicate output filter registration in one request */
+    protected $outputFilterRegistered = false;
+
     public function getDisplayName()
     {
         return __('plugins.generic.faqPopup.displayName');
@@ -28,9 +31,7 @@ class FAQPopupPlugin extends GenericPlugin
             return true;
         }
 
-        if ($this->getEnabled($mainContextId)) {
-            Hook::add('TemplateManager::display', [$this, 'handleTemplateDisplay']);
-        }
+        Hook::add('TemplateManager::display', [$this, 'handleTemplateDisplay']);
 
         return true;
     }
@@ -42,6 +43,15 @@ class FAQPopupPlugin extends GenericPlugin
         $request = Application::get()->getRequest();
 
         if (!is_string($template) || strpos($template, 'frontend/') !== 0) {
+            return false;
+        }
+
+        $context = method_exists($request, 'getContext') ? $request->getContext() : null;
+        if (is_object($context) && method_exists($context, 'getId')) {
+            if (!$this->getEnabled($context->getId())) {
+                return false;
+            }
+        } elseif (!$this->getEnabled()) {
             return false;
         }
 
@@ -91,7 +101,10 @@ class FAQPopupPlugin extends GenericPlugin
             'faqPopupQuestions' => $questions,
         ]);
 
-        $templateMgr->registerFilter('output', [$this, 'injectPopupMarkup']);
+        if (!$this->outputFilterRegistered) {
+            $templateMgr->registerFilter('output', [$this, 'injectPopupMarkup']);
+            $this->outputFilterRegistered = true;
+        }
 
         return false;
     }
@@ -177,11 +190,18 @@ class FAQPopupPlugin extends GenericPlugin
 
     public function injectPopupMarkup($output, $templateMgr)
     {
-        if (strpos($output, 'faqPopup') !== false) {
+        static $alreadyInjected = false;
+        if ($alreadyInjected) {
+            return $output;
+        }
+
+        if (strpos($output, 'id="faqPopup"') !== false) {
+            $alreadyInjected = true;
             return $output;
         }
 
         $popupMarkup = $templateMgr->fetch($this->getTemplateResource('faqPopup.tpl'));
+        $alreadyInjected = true;
 
         if (strpos($output, '</body>') !== false) {
             return str_replace('</body>', $popupMarkup . "\n</body>", $output);

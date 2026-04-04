@@ -45,7 +45,7 @@ services:
       - /etc/localtime:/etc/localtime
       - ./volumes/private:/var/www/files
       - ./volumes/public:/var/www/html/public
-      - ./plugins/generic/simplePopupButton:/var/www/html/plugins/generic/simplePopupButton
+      - ./plugins/generic:/var/www/html/plugins/generic
       - ./volumes/logs/app:/var/log/apache2
 #      # WARNING: You can only enable file-volumes if file exists in the container.
       - ./volumes/config/pkp.config.inc.php:/var/www/html/config.inc.php
