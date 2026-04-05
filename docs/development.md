@@ -1,24 +1,25 @@
 # Development Workflow
 
-This repository is optimized for local OJS plugin development.
+This workspace provides the Docker stack, helper scripts, and CI automation that the Ceon Help Center plugin relies on. The plugin source code now lives in https://github.com/DusanStijovic/ceon-help-center, so clone or symlink that repository into this workspace so it appears at `plugins/generic/ceonHelpCenter`.
 
-## Local development
+## Setup steps
 
-- Use Docker locally to run OJS and MariaDB.
-- Keep custom plugins in `plugins/generic/`.
-- Mount the plugin into the local OJS container through `docker-compose.yml`.
+1. Clone the plugin repo (or symlink from another location) into `plugins/generic/ceonHelpCenter`.
+2. Start the local stack with:
+   ```bash
+   docker compose up -d
+   ```
+3. If you need Xdebug or rebuild the base image:
+   ```bash
+   docker compose build app
+   docker compose up -d app
+   ```
+4. Run `scripts/smoke-ojs.sh` whenever you want a quick sanity check that the container boots and the plugin parses.
 
-## Production model
+## Workflow
 
-- Production OJS can stay outside Docker.
-- Deploy only the plugin directory or plugin zip to the production OJS server.
-- Do not deploy this repo's local Docker setup to production unless you intentionally adopt a containerized production stack.
+- Edit the plugin files inside `plugins/generic/ceonHelpCenter` (the changes belong in that repo).
+- Restart the container when PHP changes are made, or reload the plugin from the OJS admin UI.
+- Use `scripts/package-plugin.sh plugins/generic/ceonHelpCenter` to build deployment zips.
 
-## Typical loop
-
-1. Start local OJS with Docker.
-2. Develop plugin code in `plugins/generic/<pluginName>`.
-3. Enable the plugin in OJS admin.
-4. Test in the browser and logs.
-5. Package the plugin with `scripts/package-plugin.sh`.
-6. Deploy the packaged plugin to the production OJS installation.
+Keeping the plugin code outside this repo ensures the workspace stays focused on the tooling and environment configuration.

@@ -1,82 +1,36 @@
 # OJS Plugin Development Workspace
 
-This repository is set up for custom OJS plugin development.
+This repository keeps the Docker stack, helper scripts, and CI automation for building OJS plugins. The plugin logic has been moved into its own repo (`https://github.com/DusanStijovic/ceon-help-center`). Clone that repository into `plugins/generic/ceonHelpCenter` (or symlink from wherever you keep the code) before using the workspace.
 
-Suggested repository name: `ojs-plugins-workspace`
+## Quick start
 
-The current model is:
-
-- Docker is used locally for development and testing.
-- Production OJS may run without Docker.
-- Only plugin code is intended to be deployed to production.
+1. Clone or symlink the plugin repo into this workspace so it lives at `plugins/generic/ceonHelpCenter`.
+2. Start the local stack with `docker compose up -d`.
+3. (Optional) rebuild the `app` image when you need Xdebug or dependency changes:
+   ```bash
+   docker compose build app
+   docker compose up -d app
+   ```
+4. Use `scripts/smoke-ojs.sh` to sanity-check the container setup.
 
 ## Repository layout
 
-- `plugins/generic/`: custom OJS plugins
-- `docker-compose.yml`: local development stack
-- `Dockerfile`: local development image, including optional Xdebug support
-- `scripts/package-plugin.sh`: packages a plugin directory into a deployable zip
-- `docs/development.md`: local development workflow
-- `docs/deployment.md`: production deployment approach
-- `tests/php/`: PHPUnit plugin logic tests
-- `tests/e2e/`: Playwright browser tests
+- `plugins/generic/`: mount point for whatever plugin you are developing
+- `docker-compose.yml` / `Dockerfile`: local OJS stack configuration
+- `scripts/package-plugin.sh`: generic helper that zips any plugin directory using its `version.xml`
+- `scripts/smoke-ojs.sh`: boots the stack, waits for HTTP, and verifies mounted plugins parse
+- `docs/`: workspace-focused development, testing, and deployment notes
 
-## Local development
+## Packaging & releases
 
-Start the local stack:
+From the workspace root you can still create a deployable zip for your plugin (assuming it sits under `plugins/generic/ceonHelpCenter`):
 
 ```bash
-docker compose up -d
+./scripts/package-plugin.sh plugins/generic/ceonHelpCenter
 ```
 
-If you are using the local image build with Xdebug enabled:
+That writes `dist/ceonHelpCenter-<release>.zip`, reusing the release number in `version.xml`. The GitHub workflows expect tags such as `ceonHelpCenter-v1.0.0` and upload the same ZIP as a release asset.
 
-```bash
-docker compose build app
-docker compose up -d app
-```
+## Documentation
 
-The current custom plugin is:
-
-- `plugins/generic/simplePopupButton`
-
-## Plugin packaging
-
-Create a deployable zip for a plugin:
-
-```bash
-./scripts/package-plugin.sh plugins/generic/simplePopupButton
-```
-
-That writes a zip to `dist/`.
-
-## Production deployment
-
-For a non-Docker production OJS server, deploy only the plugin directory or the generated plugin zip into the production OJS install:
-
-```text
-plugins/generic/simplePopupButton
-```
-
-See:
-
-- `docs/development.md`
-- `docs/deployment.md`
-- `docs/testing.md`
-
-For test commands and examples for adding new tests, start with `docs/testing.md`.
-
-## GitHub automation
-
-This repository now includes workflows for:
-
-- plugin validation on PRs and `main`
-- plugin zip packaging
-- GitHub release assets from plugin tags
-- optional SSH/`rsync` deployment to production
-
-Suggested release tag format:
-
-```text
-simplePopupButton-v1.0.0
-```
+See `docs/development.md`, `docs/testing.md`, and `docs/deployment.md` for step-by-step instructions on how to run the stack, exercise the various test suites, and ship a release. Those notes assume the plugin repository is mounted under `plugins/generic/ceonHelpCenter`.
