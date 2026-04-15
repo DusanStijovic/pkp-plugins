@@ -6,7 +6,7 @@ Test files now live in:
 
 - `tests/php/SimplePopupButtonPluginTest.php`
 - `tests/php/bootstrap.php`
-- `tests/e2e/simplePopupButton.spec.js`
+- `plugins/generic/*/cypress/tests/functional/*.cy.js`
 - `tests/fixtures/simplePopupButton.fixture.html`
 
 ## How to run tests
@@ -46,28 +46,26 @@ What they are not for:
 
 ### 3. Run browser tests locally
 
-Playwright uses a small static fixture page and tests the plugin's shipped frontend assets.
+Cypress uses a small static fixture page and tests the plugin's shipped frontend assets.
 
 ```bash
 npm ci
-npx playwright install --with-deps chromium
-npx playwright test
+npm run test:e2e:ci
 ```
 
 Helpful commands:
 
 ```bash
-npx playwright test --ui
-npx playwright show-report
+npm run test:e2e:ceonHelpCenter
+npm run test:e2e:faqPopup
 ```
 
-On failure, Playwright now keeps:
+On failure, Cypress keeps:
 
 - screenshots
 - video
-- trace on first retry
 
-These are uploaded in CI as artifacts.
+These are uploaded in CI as artifacts (`cypress/screenshots`, `cypress/videos`).
 
 ### 4. Run the Docker smoke test locally
 
@@ -107,7 +105,7 @@ Then:
 
 ## 3. Browser tests
 
-Playwright checks the shipped frontend assets and popup behavior in a browser.
+Cypress checks the shipped frontend assets and popup behavior in a browser.
 
 ## 4. Release validation
 
@@ -156,17 +154,19 @@ Use PHP tests for:
 ### Add a new browser test
 
 1. Add or reuse a fixture in `tests/fixtures/`
-2. Add a spec in `tests/e2e/`
-3. Point Playwright to the fixture page
+2. Add a spec in `plugins/generic/<pluginName>/cypress/tests/functional/`
+3. Point Cypress to the fixture page
 4. Assert visible browser behavior
 
 Example:
 
 ```js
-test('does something in the browser', async ({ page }) => {
-  await page.goto('/tests/fixtures/my.fixture.html');
-  await page.locator('#myButton').click();
-  await expect(page.locator('#myModal')).toBeVisible();
+describe('my plugin', () => {
+  it('does something in the browser', () => {
+    cy.visit('/tests/fixtures/my.fixture.html');
+    cy.get('#myButton').click();
+    cy.get('#myModal').should('be.visible');
+  });
 });
 ```
 
@@ -183,5 +183,5 @@ Use browser tests for:
 Prefer this rule:
 
 - PHP test for logic
-- Playwright test for user-visible behavior
+- Cypress test for user-visible behavior
 - Docker smoke test for container/runtime confidence

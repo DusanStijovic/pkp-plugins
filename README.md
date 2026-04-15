@@ -19,7 +19,7 @@ The current model is:
 - `docs/development.md`: local development workflow
 - `docs/deployment.md`: production deployment approach
 - `tests/php/`: PHPUnit plugin logic tests
-- `tests/e2e/`: Playwright browser tests
+- `plugins/generic/*/cypress/tests/functional/`: Cypress browser tests
 
 ## Local development
 
